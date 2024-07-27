@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 视口设置 -->
     <title>玩家获奖信息查询</title>
     <style>
         body {
@@ -12,13 +13,13 @@
             min-height: 100vh;
             margin: 0;
             background-color: #f2f2f2; /* Light gray background */
-			background-image: url("bg.png");
-			background-repeat: no-repeat;
-			background-size: cover;
-			background-position: center;
+            background-image: url("bg.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
         }
         .container {
-            width: 80%;
+            width: 90%;
             max-width: 800px;
             background-color: #fff; /* White background for container */
             padding: 20px;
@@ -31,17 +32,18 @@
         }
         #searchContainer {
             display: flex;
+            flex-direction: column; /* Stack elements vertically */
             align-items: center;
-            justify-content: center;
             margin-bottom: 20px;
         }
         #playerName {
-            flex: 1;
+            width: 100%;
+            max-width: 300px;
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            margin-right: 10px;
+            margin-bottom: 10px; /* Space between input and button */
             box-sizing: border-box; /* Ensure padding is included in width */
         }
         #searchBtn {
@@ -53,6 +55,8 @@
             border: none;
             border-radius: 5px;
             transition: background-color 0.3s;
+            width: 100%;
+            max-width: 300px;
         }
         #searchBtn:hover {
             background-color: #45a049; /* Darker green when hovered */
@@ -100,6 +104,15 @@
         .view-btn:active, .download-btn:active {
             background-color: #357a38; /* Dark green when clicked */
         }
+        @media (max-width: 600px) {
+            #searchContainer {
+                flex-direction: column;
+            }
+            #playerName, #searchBtn {
+                width: 100%;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -116,8 +129,8 @@
 
     <script>
         let awardData = {};
-		
-		// 读取JSON文件内容
+        
+        // 读取JSON文件内容
         fetch('player_award_info.json')
             .then(response => response.json())
             .then(data => {
