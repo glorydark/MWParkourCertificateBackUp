@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>玩家获奖信息查询</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2; /* Light gray background */
+			background-image: url("bg.png");
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-position: center;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff; /* White background for container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for a bit of depth */
+        }
+        #header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #searchContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        #playerName {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            box-sizing: border-box; /* Ensure padding is included in width */
+        }
+        #searchBtn {
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+            background-color: #4CAF50; /* Green background color */
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        #searchBtn:hover {
+            background-color: #45a049; /* Darker green when hovered */
+        }
+        #searchBtn:active {
+            background-color: #357a38; /* Dark green when clicked */
+        }
+        #resultsContainer {
+            margin-top: 20px;
+        }
+        .award {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        .award p {
+            margin: 5px 0;
+        }
+        .certificate-image {
+            max-width: 100%;
+            height: auto;
+            display: none; /* Initially hide certificate images */
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .view-btn, .download-btn {
+            margin-top: 5px;
+            cursor: pointer;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #4CAF50; /* Green background color */
+            transition: background-color 0.3s;
+        }
+        .view-btn:hover, .download-btn:hover {
+            background-color: #45a049; /* Darker green when hovered */
+        }
+        .view-btn:active, .download-btn:active {
+            background-color: #357a38; /* Dark green when clicked */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="header">
+            <h1>玩家获奖信息查询</h1>
+            <div id="searchContainer">
+                <input type="text" id="playerName" placeholder="输入玩家昵称">
+                <button id="searchBtn" onclick="searchPlayer()">查询</button>
+            </div>
+        </div>
+        <div id="resultsContainer"></div>
+    </div>
+
+    <script>
+        let awardData = {};
+		
+		// 读取JSON文件内容
+        fetch('player_award_info.json')
+            .then(response => response.json())
+            .then(data => {
+                awardData = data;
+                console.log("Award data loaded:", awardData);
+            })
+            .catch(error => console.error('Error loading JSON:', error));
+
+        function searchPlayer() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '';
+
+            if (playerName in awardData) {
+                const awards = awardData[playerName];
+                awards.forEach(award => {
+                    const awardElement = document.createElement('div');
+                    awardElement.className = 'award';
+                    awardElement.innerHTML = `
+                        <p>证书号: ${award.certificate_id}</p>
+                        <p>比赛名称: ${award.competition_name}</p>
+                        <p>奖项: ${award.grade}</p>
+                        <button class="view-btn" onclick="toggleCertificate('${award.certificate_id}')">查看证书</button>
+                        <button class="download-btn" onclick="downloadCertificate('${award.certificate_id}')">下载证书</button>
+                        <img class="certificate-image" id="${award.certificate_id}" style="display: none;" src="cer/${award.certificate_id}.png" alt="${award.certificate_id}">
+                    `;
+                    resultsContainer.appendChild(awardElement);
+                });
+            } else {
+                resultsContainer.innerHTML = '<p>未找到该玩家的获奖信息。</p>';
+            }
+        }
+
+        function toggleCertificate(certificateId) {
+            const imageElement = document.getElementById(certificateId);
+            if (imageElement.style.display === 'none' || imageElement.style.display === '') {
+                imageElement.style.display = 'block';
+            } else {
+                imageElement.style.display = 'none';
+            }
+        }
+
+        function downloadCertificate(certificateId) {
+            const downloadLink = document.createElement('a');
+            downloadLink.href = `cer/${certificateId}.png`;
+            downloadLink.download = `${certificateId}.png`;
+            downloadLink.click();
+        }
+    </script>
+</body>
+</html>
